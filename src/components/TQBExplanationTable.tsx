@@ -38,13 +38,13 @@ export default function TQBExplanationTable({ rankings, isERTQB = false }: TQBEx
                             <th className="px-4 py-4 border-b border-dark-600 text-center">
                                 {isERTQB ? 'Earned Runs' : 'Runs Scored'}
                             </th>
-                            <th className="px-4 py-4 border-b border-dark-600 text-center">Innings (A)</th>
-                            <th className="px-4 py-4 border-b border-dark-600 text-center text-gray-500">Ratio (S)</th>
+                            <th className="px-4 py-4 border-b border-dark-600 text-center">Inns at Bat</th>
+                            <th className="px-4 py-4 border-b border-dark-600 text-center text-gray-500">Offensive Ratio</th>
                             <th className="px-4 py-4 border-b border-dark-600 text-center">
                                 {isERTQB ? 'E.Runs Allowed' : 'Runs Allowed'}
                             </th>
-                            <th className="px-4 py-4 border-b border-dark-600 text-center">Innings (B)</th>
-                            <th className="px-4 py-4 border-b border-dark-600 text-center text-gray-500">Ratio (A)</th>
+                            <th className="px-4 py-4 border-b border-dark-600 text-center">Inns on Defense</th>
+                            <th className="px-4 py-4 border-b border-dark-600 text-center text-gray-500">Defensive Ratio</th>
                             <th className="px-4 py-4 border-b border-dark-600 text-right">Final {isERTQB ? 'ER-TQB' : 'TQB'}</th>
                         </tr>
                     </thead>

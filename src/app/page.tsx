@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Team, GameData, TeamStats, TieBreakMethod, ScreenNumber } from '@/lib/types';
 import { generateMatchups, calculateRankings } from '@/lib/calculations';
 import Header from '@/components/Header';
@@ -29,6 +29,11 @@ export default function Home() {
     // Modal states
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
+
+    // Scroll to top when screen changes
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, [currentScreen]);
 
     // Calculate total steps dynamically
     const totalSteps = useMemo(() => {
@@ -194,7 +199,7 @@ export default function Home() {
 
             {/* Footer */}
             <footer className="py-4 text-center text-sm text-gray-500 border-t border-dark-600">
-                <p>TQB Calculator v1.0.0 • WBSC Rule C11 Tie-Breaker System</p>
+                <p>TQB Calculator v1.0.0 • WBSC Rule C11 Tie-Breaker</p>
             </footer>
 
             {/* Modals */}

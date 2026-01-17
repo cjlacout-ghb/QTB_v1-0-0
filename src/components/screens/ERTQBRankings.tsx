@@ -76,7 +76,7 @@ export default function ERTQBRankings({
                             </p>
                             {!hasUnresolvedTies && (
                                 <p className="text-xs text-gray-400 mt-1">
-                                    If further tie-breaking is needed: 5) Highest Batting Average, 6) Coin Toss
+                                    If further tie-breaking is needed: 5) Highest Batting Average | 6) Coin Toss
                                 </p>
                             )}
                         </div>
@@ -87,7 +87,7 @@ export default function ERTQBRankings({
                         <table className="table-dark w-full">
                             <thead>
                                 <tr>
-                                    <th className="w-16">Rank</th>
+                                    <th className="w-20 text-center">Rank</th>
                                     <th>Team</th>
                                     <th className="text-center w-24">W-L</th>
                                     <th className="text-right w-32">ER-TQB</th>
@@ -98,8 +98,10 @@ export default function ERTQBRankings({
                                     const displayRanks = calculateDisplayRanks(rankings, true);
                                     return rankings.map((team, index) => (
                                         <tr key={team.id} className="animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
-                                            <td>
-                                                <RankBadge rank={displayRanks[index]} />
+                                            <td className="text-center">
+                                                <div className="flex justify-center">
+                                                    <RankBadge rank={displayRanks[index]} />
+                                                </div>
                                             </td>
                                             <td>
                                                 <span className="font-semibold text-white">{team.name}</span>
@@ -144,29 +146,29 @@ export default function ERTQBRankings({
                             <span className="group-open:rotate-90 transition-transform">▶</span>
                             Compare TQB vs ER-TQB values
                         </summary>
-                        <div className="mt-3 overflow-x-auto">
-                            <table className="table-dark w-full">
-                                <thead>
+                        <div className="mt-3 overflow-x-auto rounded-xl border border-dark-600 bg-dark-800/50">
+                            <table className="table-dark w-full border-collapse">
+                                <thead className="bg-dark-700 text-gray-400 uppercase text-[10px] tracking-wider font-bold">
                                     <tr>
-                                        <th>Team</th>
-                                        <th className="text-right">TQB</th>
-                                        <th className="text-right">ER-TQB</th>
-                                        <th className="text-right">Difference</th>
+                                        <th className="px-4 py-3 border-b border-dark-600">Team</th>
+                                        <th className="px-4 py-3 border-b border-dark-600 text-right">TQB</th>
+                                        <th className="px-4 py-3 border-b border-dark-600 text-right">ER-TQB</th>
+                                        <th className="px-4 py-3 border-b border-dark-600 text-right">Difference</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-dark-600">
                                     {rankings.map((team) => {
                                         const diff = team.erTqb - team.tqb;
                                         return (
-                                            <tr key={team.id}>
-                                                <td className="text-white">{team.name}</td>
-                                                <td className="text-right font-mono text-gray-400">
+                                            <tr key={team.id} className="hover:bg-dark-700/30">
+                                                <td className="px-4 py-3 font-bold text-white">{team.name}</td>
+                                                <td className="px-4 py-3 text-right font-mono text-gray-400">
                                                     {formatTQBValue(team.tqb)}
                                                 </td>
-                                                <td className="text-right font-mono text-primary-400">
+                                                <td className="px-4 py-3 text-right font-mono text-primary-400">
                                                     {formatTQBValue(team.erTqb)}
                                                 </td>
-                                                <td className={`text-right font-mono ${diff >= 0 ? 'text-success-400' : 'text-error-400'
+                                                <td className={`px-4 py-3 text-right font-mono ${diff >= 0 ? 'text-success-400' : 'text-error-400'
                                                     }`}>
                                                     {formatTQBValue(diff)}
                                                 </td>
@@ -184,47 +186,60 @@ export default function ERTQBRankings({
                             <span className="group-open:rotate-90 transition-transform">▶</span>
                             View game results summary
                         </summary>
-                        <div className="mt-3 p-4 bg-dark-700/30 rounded-xl space-y-2">
+                        <div className="mt-3 p-4 bg-dark-700/30 rounded-xl divide-y divide-dark-600">
                             {games.map((game, index) => (
-                                <div key={game.id} className="flex items-center justify-between text-sm py-2 border-b border-dark-600 last:border-0">
-                                    <span className="text-gray-400">Game {index + 1}</span>
-                                    <span className="font-mono text-white">
-                                        {game.teamAName}{' '}
-                                        <span className={
-                                            (game.runsA ?? 0) > (game.runsB ?? 0) ? 'text-success-400' :
-                                                (game.runsA ?? 0) < (game.runsB ?? 0) ? 'text-gray-400' : 'text-warning-400'
-                                        }>{game.runsA}</span>
-                                        <span className="text-gray-600">/{game.earnedRunsA}</span>
-                                        <span className="text-gray-500 mx-2">vs</span>
-                                        <span className={
-                                            (game.runsB ?? 0) > (game.runsA ?? 0) ? 'text-success-400' :
-                                                (game.runsB ?? 0) < (game.runsA ?? 0) ? 'text-gray-400' : 'text-warning-400'
-                                        }>{game.runsB}</span>
-                                        <span className="text-gray-600">/{game.earnedRunsB}</span>{' '}
-                                        {game.teamBName}
-                                    </span>
+                                <div key={game.id} className="grid grid-cols-[80px_1fr_60px_20px_60px_1fr] items-center gap-2 py-3 first:pt-0 last:pb-0">
+                                    <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Game {index + 1}</span>
+
+                                    <span className="text-right font-medium text-white truncate">{game.teamAName}</span>
+
+                                    <div className="flex flex-col items-center">
+                                        <div className={`w-full text-center font-mono font-bold text-lg rounded-t-lg py-0.5 ${(game.runsA ?? 0) > (game.runsB ?? 0) ? 'bg-success-500/20 text-success-400' :
+                                            (game.runsA ?? 0) < (game.runsB ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
+                                            }`}>
+                                            {game.runsA}
+                                        </div>
+                                        <div className="w-full text-center font-mono text-[10px] bg-dark-800 text-gray-500 rounded-b-lg py-0.5 border-t border-dark-600">
+                                            ER: {game.earnedRunsA}
+                                        </div>
+                                    </div>
+
+                                    <span className="text-gray-600 text-center font-bold">:</span>
+
+                                    <div className="flex flex-col items-center">
+                                        <div className={`w-full text-center font-mono font-bold text-lg rounded-t-lg py-0.5 ${(game.runsB ?? 0) > (game.runsA ?? 0) ? 'bg-success-500/20 text-success-400' :
+                                            (game.runsB ?? 0) < (game.runsA ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
+                                            }`}>
+                                            {game.runsB}
+                                        </div>
+                                        <div className="w-full text-center font-mono text-[10px] bg-dark-800 text-gray-500 rounded-b-lg py-0.5 border-t border-dark-600">
+                                            ER: {game.earnedRunsB}
+                                        </div>
+                                    </div>
+
+                                    <span className="text-left font-medium text-white truncate">{game.teamBName}</span>
                                 </div>
                             ))}
-                            <p className="text-xs text-gray-500 pt-2">
-                                Format: Total Runs / Earned Runs
+                            <p className="text-[10px] text-gray-500 pt-3 italic text-center uppercase tracking-widest">
+                                ER: Earned Runs (Used for ER-TQB Tie-Break)
                             </p>
                         </div>
                     </details>
 
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
                         <button
                             onClick={onExportPDF}
-                            className="flex-1 btn-primary py-4"
+                            className="flex-1 btn-primary py-4 shadow-xl shadow-primary-500/20"
                         >
-                            <FileDown size={20} />
+                            <FileDown size={20} className="mr-1" />
                             Export to PDF
                         </button>
                         <button
                             onClick={onStartNew}
-                            className="flex-1 btn-ghost py-4"
+                            className="flex-1 btn-ghost border border-dark-500 hover:border-gray-400 py-4"
                         >
-                            <RotateCcw size={20} />
+                            <RotateCcw size={20} className="mr-1" />
                             Start New Calculation
                         </button>
                     </div>

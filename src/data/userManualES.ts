@@ -101,10 +101,21 @@ El softbol cuenta outs por entrada (3 outs = 1 entrada completa). Si un partido 
 
 **Ejemplo**: Si un partido termina después de que el Equipo A hace 2 outs en la 7ma entrada, ingrese "6.2" (6 entradas completas + 2 outs = 6⅔ entradas).
 
-**Entradas al Bate vs. en Defensa**
-- **Entradas al Bate**: Número de entradas que el equipo pasó bateando (ofensiva)
-- **Entradas en Defensa**: Número de entradas que el equipo pasó en el campo (defensa)
-- Estas pueden diferir en partidos que terminan temprano (ej., regla de misericordia, lluvia)
+### Reglas Específicas de Softbol
+
+Para garantizar la integridad de los datos, la calculadora aplica varias restricciones reglamentarias de softbol:
+
+**1. Lados Local/Visitante (Intercambiar)**
+- Al hacer clic en **"Intercambiar Lados"**, se cambia qué equipo es el Local y cuál es el Visitante.
+- Esto es importante porque el estado Local/Visitante afecta las restricciones de entradas.
+
+**2. Entradas Sincronizadas**
+- Cuando ingresa las **Entradas al Bate** para el Equipo A, las **Entradas en Defensa** para el Equipo B se actualizan automáticamente al mismo valor.
+- Esto asegura la consistencia en el registro del partido.
+
+**3. Restricciones del Equipo Local**
+- **Equipo Local Gana**: Si el equipo local está ganando, debe tener **menos** entradas al bate que el Visitante (ya que no se completa la parte baja de la última entrada).
+- **Equipo Local Pierde**: Si el equipo local pierde, debe tener **exactamente las mismas** entradas al bate que el Visitante.
     `,
     },
     {
@@ -276,6 +287,14 @@ Como el enfrentamiento directo está empatado, calculamos TQB:
 - Use solo números enteros o decimales .1 o .2
 - Válido: 7, 7.1, 7.2, 6, 6.1, 6.2
 - Inválido: 7.3, 7.5, 6.33, etc.
+
+**"El equipo local ganador debe tener menos entradas al bate..."**
+- Según las reglas de softbol, si el equipo local gana, generalmente no termina su última media entrada al bate.
+- Ajuste las **Entradas al Bate** del equipo local para que sean menores que las del visitante.
+
+**"El equipo local perdedor debe tener exactamente las mismas entradas..."**
+- Si el equipo local pierde, debe haber completado las mismas oportunidades ofensivas que el equipo visitante.
+- Asegúrese de que ambos equipos tengan el mismo valor de **Entradas al Bate**.
 
 **"Campos requeridos faltantes"**
 - Todos los campos de carreras y entradas deben estar llenos

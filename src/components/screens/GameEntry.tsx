@@ -305,7 +305,7 @@ function GameCard({ game, gameNumber, errors, onUpdate, onSwap }: GameCardProps)
                             </h3>
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5 uppercase tracking-widest font-semibold font-mono">
-                            Pool Stage Matchup
+                            Tie-Breaker Matchup
                         </p>
                     </div>
                 </div>

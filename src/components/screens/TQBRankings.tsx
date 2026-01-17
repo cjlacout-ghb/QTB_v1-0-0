@@ -80,7 +80,7 @@ export default function TQBRankings({
                             </p>
                             {!needsERTQB && (
                                 <p className="text-xs text-gray-400 mt-1">
-                                    If further tie-breaking is needed: 4) Highest Batting Average, 5) Coin Toss
+                                    If further tie-breaking is needed: 4) Highest Batting Average | 5) Coin Toss
                                 </p>
                             )}
                         </div>
@@ -158,7 +158,7 @@ export default function TQBRankings({
                                     <span className="text-right font-medium text-white truncate">{game.teamAName}</span>
 
                                     <div className={`text-center font-mono font-bold text-lg rounded-lg py-1 ${(game.runsA ?? 0) > (game.runsB ?? 0) ? 'bg-success-500/20 text-success-400' :
-                                            (game.runsA ?? 0) < (game.runsB ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
+                                        (game.runsA ?? 0) < (game.runsB ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
                                         }`}>
                                         {game.runsA}
                                     </div>
@@ -166,7 +166,7 @@ export default function TQBRankings({
                                     <span className="text-gray-600 text-center font-bold">:</span>
 
                                     <div className={`text-center font-mono font-bold text-lg rounded-lg py-1 ${(game.runsB ?? 0) > (game.runsA ?? 0) ? 'bg-success-500/20 text-success-400' :
-                                            (game.runsB ?? 0) < (game.runsA ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
+                                        (game.runsB ?? 0) < (game.runsA ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
                                         }`}>
                                         {game.runsB}
                                     </div>

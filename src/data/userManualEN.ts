@@ -101,10 +101,21 @@ Softball counts outs per inning (3 outs = 1 complete inning). If a game ends mid
 
 **Example**: If a game ends after Team A makes 2 outs in the 7th inning, enter "6.2" (6 complete innings + 2 outs = 6⅔ innings).
 
-**Innings at Bat vs. Defense**
-- **Innings at Bat**: Number of innings the team spent batting (offense)
-- **Innings on Defense**: Number of innings the team spent in the field (defense)
-- These can differ in games that end early (e.g., mercy rule, rain)
+### Softball-Specific Rules
+
+To ensure data integrity, the calculator enforces several softball regulatory constraints:
+
+**1. Home/Visitor Sides (Swap Sides)**
+- Clicking **"Swap Sides"** toggles which team is the Home team and which is the Visitor.
+- This is important because Home/Visitor status affects inning constraints.
+
+**2. Synchronized Innings**
+- When you enter **Innings at Bat** for Team A, the **Innings on Defense** for Team B is automatically updated to the same value.
+- This ensures consistency across the game record.
+
+**3. Home Team Inning Constraints**
+- **Home Team Wins**: If the Home team is winning, they must have **fewer** innings at bat than the Visitor (since the bottom of the last inning is not completed).
+- **Home Team Loses**: If the Home team loses, they must have **exactly the same** innings at bat as the Visitor.
     `,
     },
     {
@@ -277,8 +288,16 @@ Since head-to-head is tied, calculate TQB:
 - Valid: 7, 7.1, 7.2, 6, 6.1, 6.2
 - Invalid: 7.3, 7.5, 6.33, etc.
 
+**"Winning home team must have fewer innings at bat..."**
+- According to softball rules, if the home team wins, they usually do not finish their last half-inning at bat.
+- Adjust the **Innings at Bat** for the home team to be less than the visitor.
+
+**"Losing home team must have exactly the same innings..."**
+- If the home team loses, they must have completed the same number of offensive opportunities as the visiting team.
+- Ensure both teams have the same **Innings at Bat** value.
+
 **"Missing required fields"**
-- All runs and innings fields must be filled
+- All runs and innings fields must be filled 
 - Check each game for empty inputs
 
 **"Team name already exists"**
