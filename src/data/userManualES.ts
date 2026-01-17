@@ -32,16 +32,16 @@ Esta aplicación ayuda a oficiales de torneos y entrenadores a determinar con pr
 ### Consejos
 - Use nombres oficiales de equipos para un registro preciso
 - Verifique la ortografía antes de continuar
-- También puede cargar un archivo CSV con todos los datos prellenados
+- También puede cargar un archivo (CSV o TXT) con todos los datos prellenados
     `,
     },
     {
         id: 'csv-upload',
-        title: 'Guía de Carga CSV',
+        title: 'Guía de Carga de Archivos',
         content: `
-### Formato CSV
+### Formato de Archivo (CSV/TXT)
 
-Cargue un archivo CSV para llenar automáticamente todos los datos de equipos y partidos. El archivo debe tener las siguientes columnas:
+Cargue un archivo CSV o TXT para llenar automáticamente todos los datos de equipos y partidos. El archivo debe tener las siguientes columnas:
 
 | Columna | Descripción |
 |---------|-------------|
@@ -56,7 +56,7 @@ Cargue un archivo CSV para llenar automáticamente todos los datos de equipos y 
 | Innings_B_Batting | Entradas del Equipo B al bate |
 | Innings_B_Defense | Entradas del Equipo B en defensa |
 
-### CSV de Ejemplo
+### Contenido de Ejemplo del Archivo
 
 \`\`\`
 Team_A,Team_B,Runs_A,Runs_B,Earned_Runs_A,Earned_Runs_B,Innings_A_Batting,Innings_A_Defense,Innings_B_Batting,Innings_B_Defense
@@ -65,9 +65,10 @@ Aguilas,Tiburones,2,8,1,6,7,7,7,7
 \`\`\`
 
 ### Cómo Cargar
-1. Haga clic en el botón **"Cargar CSV"** o arrastre y suelte su archivo
-2. El sistema validará el formato y extraerá los nombres de equipos
-3. Si es válido, procederá directamente a los resultados
+1. **Cargar Archivo**: (Paso 1) Arrastre y suelte su archivo CSV o TXT en el área de carga.
+2. **Verificar Datos**: (Paso 2) La aplicación se mueve automáticamente al Paso 2. Todos los datos de los partidos importados se pre-llenan.
+3. **Editar (Opcional)**: Si es necesario, puede corregir cualquier valor (carreras, entradas) directamente en esta pantalla.
+4. **Calcular**: Haga clic en **"Calcular Clasificaciones"** en la parte inferior de la pantalla para ver los resultados.
     `,
     },
     {
@@ -284,7 +285,7 @@ Como el enfrentamiento directo está empatado, calculamos TQB:
 - Cada equipo debe tener un nombre único
 - Verifique entradas duplicadas
 
-**Errores de carga CSV**
+**Errores de carga de archivos**
 - Asegúrese de que las 10 columnas estén presentes
 - Verifique comas faltantes o columnas extra
 - Verifique el formato de entradas en su hoja de cálculo

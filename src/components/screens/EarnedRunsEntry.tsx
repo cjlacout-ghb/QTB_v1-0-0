@@ -154,14 +154,16 @@ export default function EarnedRunsEntry({
                     )}
 
                     {/* Calculate Button */}
-                    <button
-                        onClick={handleCalculate}
-                        disabled={!allFieldsFilled}
-                        className="w-full btn-success py-4 text-lg"
-                    >
-                        <Calculator size={20} />
-                        Calculate ER-TQB Rankings
-                    </button>
+                    <div className="pt-4">
+                        <button
+                            onClick={handleCalculate}
+                            disabled={!allFieldsFilled}
+                            className="w-full btn-success py-4 text-xl shadow-xl shadow-success-500/20"
+                        >
+                            <Calculator size={22} className="mr-1" />
+                            Calculate ER-TQB Rankings
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,18 +189,31 @@ function EarnedRunsCard({ game, gameNumber, errors, onUpdate }: EarnedRunsCardPr
     return (
         <div className="game-card animate-slide-up">
             {/* Game Header */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-dark-500">
-                <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-dark-600 rounded-lg text-sm font-mono text-gray-400">
-                        Game {gameNumber}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-dark-600">
+                <div className="flex items-center gap-4">
+                    <span className="flex items-center justify-center w-12 h-12 bg-dark-700/50 rounded-xl text-sm font-mono text-primary-400 border border-dark-500 shadow-inner">
+                        #{gameNumber}
                     </span>
-                    <h3 className="text-lg font-semibold text-white">
-                        {game.teamAName} <span className="text-gray-500 mx-2">vs</span> {game.teamBName}
-                    </h3>
+                    <div>
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-xl font-bold text-white tracking-tight">
+                                {game.teamAName}
+                                <span className="mx-2 text-gray-600 font-light">vs</span>
+                                {game.teamBName}
+                            </h3>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5 uppercase tracking-widest font-semibold font-mono">
+                            Tie-Breaker Matchup
+                        </p>
+                    </div>
                 </div>
-                <span className="text-sm font-mono text-gray-400">
-                    Final: {game.runsA} - {game.runsB}
-                </span>
+
+                <div className="px-4 py-2 bg-dark-600/50 border border-dark-500 rounded-lg text-sm font-mono text-white flex items-center gap-2">
+                    <span className="text-gray-500 text-[10px] uppercase font-bold tracking-wider">Final:</span>
+                    <span className="text-success-400">{game.runsA}</span>
+                    <span className="text-gray-600">-</span>
+                    <span className="text-success-400">{game.runsB}</span>
+                </div>
             </div>
 
             {/* Two Column Layout */}

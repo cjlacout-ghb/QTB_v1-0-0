@@ -32,16 +32,16 @@ This application helps tournament officials and coaches accurately determine tea
 ### Tips
 - Use official team names for accurate record-keeping
 - Double-check spelling before proceeding
-- You can also upload a CSV file with all data pre-filled
+- You can also upload a file (CSV or TXT) with all data pre-filled
     `,
     },
     {
         id: 'csv-upload',
-        title: 'CSV Upload Guide',
+        title: 'File Upload Guide',
         content: `
-### CSV Format
+### File Format (CSV/TXT)
 
-Upload a CSV file to automatically fill in all team and game data. The file must have the following columns:
+Upload a CSV or TXT file to automatically fill in all team and game data. The file must have the following columns:
 
 | Column | Description |
 |--------|-------------|
@@ -56,7 +56,7 @@ Upload a CSV file to automatically fill in all team and game data. The file must
 | Innings_B_Batting | Innings Team B was at bat |
 | Innings_B_Defense | Innings Team B was on defense |
 
-### Sample CSV
+### Sample File Content
 
 \`\`\`
 Team_A,Team_B,Runs_A,Runs_B,Earned_Runs_A,Earned_Runs_B,Innings_A_Batting,Innings_A_Defense,Innings_B_Batting,Innings_B_Defense
@@ -65,9 +65,10 @@ Eagles,Sharks,2,8,1,6,7,7,7,7
 \`\`\`
 
 ### How to Upload
-1. Click the **"Upload CSV"** button or drag and drop your file
-2. The system will validate the format and extract team names
-3. If valid, you'll proceed directly to the results
+1. **Upload File**: (Step 1) Drop your CSV or TXT file into the upload area.
+2. **Verify Data**: (Step 2) The app automatically moves to Step 2. All imported game data is pre-filled.
+3. **Edit (Optional)**: If needed, you can correct any values (runs, innings) directly on this screen.
+4. **Calculate**: Click **"Calculate Rankings"** at the bottom of the screen to see the results.
     `,
     },
     {
@@ -284,7 +285,7 @@ Since head-to-head is tied, calculate TQB:
 - Each team must have a unique name
 - Check for duplicate entries
 
-**CSV upload errors**
+**File upload errors**
 - Ensure all 10 columns are present
 - Check for missing commas or extra columns
 - Verify innings format in your spreadsheet

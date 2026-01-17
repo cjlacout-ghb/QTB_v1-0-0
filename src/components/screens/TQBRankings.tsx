@@ -2,7 +2,7 @@
 
 import { FileDown, RotateCcw, AlertTriangle, Trophy, Info, ArrowLeft } from 'lucide-react';
 import { TeamStats, TieBreakMethod, GameData } from '@/lib/types';
-import { formatTQBValue, getTieBreakMethodText } from '@/lib/calculations';
+import { formatTQBValue, getTieBreakMethodText, calculateDisplayRanks } from '@/lib/calculations';
 import StepIndicator from '../StepIndicator';
 import TQBExplanationTable from '../TQBExplanationTable';
 
@@ -74,7 +74,7 @@ export default function TQBRankings({
                         <div>
                             <p className={`text-sm font-medium ${needsERTQB ? 'text-warning-400' : 'text-success-400'}`}>
                                 {needsERTQB
-                                    ? 'TQB did not resolve all ties. Proceeding to ER-TQB...'
+                                    ? 'TQB did not resolve all ties. Proceed to ER-TQB.'
                                     : getTieBreakMethodText(tieBreakMethod)
                                 }
                             </p>
@@ -91,36 +91,41 @@ export default function TQBRankings({
                         <table className="table-dark w-full">
                             <thead>
                                 <tr>
-                                    <th className="w-16">Rank</th>
+                                    <th className="w-20 text-center">Rank</th>
                                     <th>Team</th>
                                     <th className="text-center w-24">W-L</th>
                                     <th className="text-right w-32">TQB</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {rankings.map((team, index) => (
-                                    <tr key={team.id} className="animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
-                                        <td>
-                                            <RankBadge rank={index + 1} />
-                                        </td>
-                                        <td>
-                                            <span className="font-semibold text-white">{team.name}</span>
-                                        </td>
-                                        <td className="text-center">
-                                            <span className="font-mono">
-                                                <span className="text-success-400">{team.wins}</span>
-                                                <span className="text-gray-500">-</span>
-                                                <span className="text-error-400">{team.losses}</span>
-                                            </span>
-                                        </td>
-                                        <td className="text-right">
-                                            <span className={`font-mono font-bold ${team.tqb >= 0 ? 'text-success-400' : 'text-error-400'
-                                                }`}>
-                                                {formatTQBValue(team.tqb)}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {(() => {
+                                    const displayRanks = calculateDisplayRanks(rankings, false);
+                                    return rankings.map((team, index) => (
+                                        <tr key={team.id} className="animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
+                                            <td className="text-center">
+                                                <div className="flex justify-center">
+                                                    <RankBadge rank={displayRanks[index]} />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className="font-semibold text-white">{team.name}</span>
+                                            </td>
+                                            <td className="text-center">
+                                                <span className="font-mono">
+                                                    <span className="text-success-400">{team.wins}</span>
+                                                    <span className="text-gray-500">-</span>
+                                                    <span className="text-error-400">{team.losses}</span>
+                                                </span>
+                                            </td>
+                                            <td className="text-right">
+                                                <span className={`font-mono font-bold ${team.tqb >= 0 ? 'text-success-400' : 'text-error-400'
+                                                    }`}>
+                                                    {formatTQBValue(team.tqb)}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ));
+                                })()}
                             </tbody>
                         </table>
                     </div>
@@ -145,34 +150,39 @@ export default function TQBRankings({
                             <span className="group-open:rotate-90 transition-transform">▶</span>
                             View game results summary
                         </summary>
-                        <div className="mt-3 p-4 bg-dark-700/30 rounded-xl space-y-2">
+                        <div className="mt-3 p-4 bg-dark-700/30 rounded-xl divide-y divide-dark-600">
                             {games.map((game, index) => (
-                                <div key={game.id} className="flex items-center justify-between text-sm py-2 border-b border-dark-600 last:border-0">
-                                    <span className="text-gray-400">Game {index + 1}</span>
-                                    <span className="font-mono text-white">
-                                        {game.teamAName}{' '}
-                                        <span className={
-                                            (game.runsA ?? 0) > (game.runsB ?? 0) ? 'text-success-400' :
-                                                (game.runsA ?? 0) < (game.runsB ?? 0) ? 'text-gray-400' : 'text-warning-400'
-                                        }>{game.runsA}</span>
-                                        <span className="text-gray-500 mx-2">vs</span>
-                                        <span className={
-                                            (game.runsB ?? 0) > (game.runsA ?? 0) ? 'text-success-400' :
-                                                (game.runsB ?? 0) < (game.runsA ?? 0) ? 'text-gray-400' : 'text-warning-400'
-                                        }>{game.runsB}</span>{' '}
-                                        {game.teamBName}
-                                    </span>
+                                <div key={game.id} className="grid grid-cols-[80px_1fr_40px_20px_40px_1fr] items-center gap-2 py-3 first:pt-0 last:pb-0">
+                                    <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Game {index + 1}</span>
+
+                                    <span className="text-right font-medium text-white truncate">{game.teamAName}</span>
+
+                                    <div className={`text-center font-mono font-bold text-lg rounded-lg py-1 ${(game.runsA ?? 0) > (game.runsB ?? 0) ? 'bg-success-500/20 text-success-400' :
+                                            (game.runsA ?? 0) < (game.runsB ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
+                                        }`}>
+                                        {game.runsA}
+                                    </div>
+
+                                    <span className="text-gray-600 text-center font-bold">:</span>
+
+                                    <div className={`text-center font-mono font-bold text-lg rounded-lg py-1 ${(game.runsB ?? 0) > (game.runsA ?? 0) ? 'bg-success-500/20 text-success-400' :
+                                            (game.runsB ?? 0) < (game.runsA ?? 0) ? 'bg-dark-600 text-gray-500' : 'bg-warning-500/20 text-warning-400'
+                                        }`}>
+                                        {game.runsB}
+                                    </div>
+
+                                    <span className="text-left font-medium text-white truncate">{game.teamBName}</span>
                                 </div>
                             ))}
                         </div>
                     </details>
 
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
                         {needsERTQB ? (
                             <button
                                 onClick={onProceedToERTQB}
-                                className="flex-1 btn-warning py-4 text-lg"
+                                className="flex-1 btn-warning py-4 text-lg shadow-xl shadow-warning-500/20"
                             >
                                 Proceed to ER-TQB Entry
                             </button>
@@ -180,16 +190,16 @@ export default function TQBRankings({
                             <>
                                 <button
                                     onClick={onExportPDF}
-                                    className="flex-1 btn-primary py-4"
+                                    className="flex-1 btn-primary py-4 shadow-xl shadow-primary-500/20"
                                 >
-                                    <FileDown size={20} />
+                                    <FileDown size={20} className="mr-1" />
                                     Export to PDF
                                 </button>
                                 <button
                                     onClick={onStartNew}
-                                    className="flex-1 btn-ghost py-4"
+                                    className="flex-1 btn-ghost border border-dark-500 hover:border-gray-400 py-4"
                                 >
-                                    <RotateCcw size={20} />
+                                    <RotateCcw size={20} className="mr-1" />
                                     Start New Calculation
                                 </button>
                             </>

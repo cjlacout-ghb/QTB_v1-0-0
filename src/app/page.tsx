@@ -35,36 +35,11 @@ export default function Home() {
         return needsERTQB ? 5 : 3;
     }, [needsERTQB]);
 
-    // Handle CSV import - go directly to results
+    // Handle CSV import - go to Step 2 (Game Entry) for verification
     const handleCSVImport = useCallback((importedTeams: Team[], importedGames: GameData[]) => {
         setTeams(importedTeams);
         setGames(importedGames);
-
-        // Calculate TQB rankings
-        const result = calculateRankings(importedTeams, importedGames, false);
-        setRankings(result.rankings);
-        setTieBreakMethod(result.tieBreakMethod);
-        setNeedsERTQB(result.needsERTQB);
-
-        // If CSV has earned runs and TQB doesn't resolve, calculate ER-TQB
-        if (result.needsERTQB) {
-            // Check if earned runs are available
-            const hasEarnedRuns = importedGames.every(
-                g => g.earnedRunsA !== null && g.earnedRunsB !== null
-            );
-
-            if (hasEarnedRuns) {
-                const erResult = calculateRankings(importedTeams, importedGames, true);
-                setRankings(erResult.rankings);
-                setTieBreakMethod(erResult.tieBreakMethod);
-                setHasUnresolvedTies(erResult.hasTies);
-                setCurrentScreen(5);
-            } else {
-                setCurrentScreen(3);
-            }
-        } else {
-            setCurrentScreen(3);
-        }
+        setCurrentScreen(2);
     }, []);
 
     // Handle proceeding from Screen 1 to Screen 2

@@ -98,8 +98,8 @@ export default function TeamEntry({
     const handleFileUpload = useCallback((file: File) => {
         setCSVError([]);
 
-        if (!file.name.endsWith('.csv')) {
-            setCSVError(['Please upload a CSV file']);
+        if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
+            setCSVError(['Please upload a CSV or TXT file']);
             return;
         }
 
@@ -224,7 +224,7 @@ export default function TeamEntry({
                         </div>
                         <div className="relative flex justify-center">
                             <span className="px-4 text-sm text-gray-500 bg-dark-800">
-                                or upload CSV
+                                or upload file
                             </span>
                         </div>
                     </div>
@@ -247,10 +247,10 @@ export default function TeamEntry({
                         <input
                             ref={fileInputRef}
                             type="file"
-                            accept=".csv"
+                            accept=".csv,.txt"
                             onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
                             className="hidden"
-                            aria-label="Upload CSV file"
+                            aria-label="Upload file"
                         />
 
                         <Upload
@@ -258,7 +258,7 @@ export default function TeamEntry({
                             className={`mx-auto mb-3 ${isDragging ? 'text-primary-400' : 'text-gray-500'}`}
                         />
                         <p className="text-gray-300 font-medium">
-                            Drop your CSV file here or click to browse
+                            Drop your file here or click to browse
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
                             Pre-fill all team and game data
@@ -273,7 +273,7 @@ export default function TeamEntry({
                             className="mt-3 inline-flex items-center gap-1 text-sm text-primary-400 hover:text-primary-300"
                         >
                             <HelpCircle size={14} />
-                            View CSV format
+                            View file format
                         </button>
                     </div>
 
@@ -281,7 +281,7 @@ export default function TeamEntry({
                     {showCSVHelp && (
                         <div className="p-4 bg-dark-700/50 rounded-xl border border-dark-500 animate-slide-up">
                             <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                                Required CSV Columns:
+                                Required Columns:
                             </h4>
                             <p className="text-xs text-gray-400 font-mono mb-3 break-all">
                                 Team_A, Team_B, Runs_A, Runs_B, Earned_Runs_A, Earned_Runs_B,
@@ -301,7 +301,7 @@ export default function TeamEntry({
                         <div className="p-4 bg-error-500/10 border border-error-500/30 rounded-xl">
                             <h4 className="text-sm font-semibold text-error-400 mb-2 flex items-center gap-2">
                                 <AlertCircle size={16} />
-                                CSV Upload Error
+                                File Upload Error
                             </h4>
                             <ul className="text-sm text-error-300 space-y-1">
                                 {csvError.map((error, i) => (

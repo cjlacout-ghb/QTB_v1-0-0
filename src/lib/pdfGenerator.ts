@@ -2,7 +2,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PDFExportData, TeamStats, GameData, TieBreakMethod } from './types';
-import { formatTQBValue, outsToInnings } from './calculations';
+import { formatTQBValue, outsToInnings, getDynamicTQBExplanation, calculateDisplayRanks } from './calculations';
 
 /**
  * Generate PDF report for tournament rankings
@@ -47,8 +47,9 @@ export function generatePDF(data: PDFExportData): void {
     doc.text('Final Standings', 14, yPos);
     yPos += 8;
 
+    const displayRanksStandings = calculateDisplayRanks(data.rankings, data.useERTQB);
     const rankingsData = data.rankings.map((team, index) => [
-        `#${index + 1}`,
+        `#${displayRanksStandings[index]}`,
         team.name,
         `${team.wins}-${team.losses}`,
         formatTQBValue(data.useERTQB ? team.erTqb : team.tqb),
@@ -95,11 +96,20 @@ export function generatePDF(data: PDFExportData): void {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
+
+    const dynamicExplanation = getDynamicTQBExplanation(data.rankings, data.useERTQB);
+    const dynamicLines = doc.splitTextToSize(dynamicExplanation, pageWidth - 28);
+    doc.setFont('helvetica', 'bolditalic');
+    doc.text(dynamicLines, 14, yPos);
+    yPos += dynamicLines.length * 5 + 3;
+
+    doc.setFont('helvetica', 'normal');
     const summaryIntro = `This summary provides a detailed breakdown of the ${data.useERTQB ? 'ER-TQB' : 'TQB'} components. The tie is resolved by comparing the offensive efficiency (Ratio Scored) against the defensive efficiency (Ratio Allowed) based on each team's total innings played.`;
     const introLines = doc.splitTextToSize(summaryIntro, pageWidth - 28);
     doc.text(introLines, 14, yPos);
     yPos += introLines.length * 5 + 5;
 
+    const displayRanksSummary = calculateDisplayRanks(data.rankings, data.useERTQB);
     const summaryTableData = data.rankings.map((team, index) => {
         const runsS = data.useERTQB ? team.earnedRunsScored : team.runsScored;
         const runsA = data.useERTQB ? team.earnedRunsAllowed : team.runsAllowed;
@@ -110,7 +120,7 @@ export function generatePDF(data: PDFExportData): void {
         const finalVal = data.useERTQB ? team.erTqb : team.tqb;
 
         return [
-            `#${index + 1}`,
+            `#${displayRanksSummary[index]}`,
             team.name,
             `${runsS}`,
             `${outsToInnings(team.inningsAtBatOuts).toFixed(1)}`,

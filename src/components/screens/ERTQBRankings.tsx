@@ -2,7 +2,7 @@
 
 import { FileDown, RotateCcw, AlertTriangle, Trophy, Info, CheckCircle, ArrowLeft } from 'lucide-react';
 import { TeamStats, TieBreakMethod, GameData } from '@/lib/types';
-import { formatTQBValue, getTieBreakMethodText } from '@/lib/calculations';
+import { formatTQBValue, getTieBreakMethodText, calculateDisplayRanks } from '@/lib/calculations';
 import StepIndicator from '../StepIndicator';
 import TQBExplanationTable from '../TQBExplanationTable';
 
@@ -94,29 +94,32 @@ export default function ERTQBRankings({
                                 </tr>
                             </thead>
                             <tbody>
-                                {rankings.map((team, index) => (
-                                    <tr key={team.id} className="animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
-                                        <td>
-                                            <RankBadge rank={index + 1} />
-                                        </td>
-                                        <td>
-                                            <span className="font-semibold text-white">{team.name}</span>
-                                        </td>
-                                        <td className="text-center">
-                                            <span className="font-mono">
-                                                <span className="text-success-400">{team.wins}</span>
-                                                <span className="text-gray-500">-</span>
-                                                <span className="text-error-400">{team.losses}</span>
-                                            </span>
-                                        </td>
-                                        <td className="text-right">
-                                            <span className={`font-mono font-bold ${team.erTqb >= 0 ? 'text-success-400' : 'text-error-400'
-                                                }`}>
-                                                {formatTQBValue(team.erTqb)}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {(() => {
+                                    const displayRanks = calculateDisplayRanks(rankings, true);
+                                    return rankings.map((team, index) => (
+                                        <tr key={team.id} className="animate-slide-up" style={{ animationDelay: `${index * 50}ms` }}>
+                                            <td>
+                                                <RankBadge rank={displayRanks[index]} />
+                                            </td>
+                                            <td>
+                                                <span className="font-semibold text-white">{team.name}</span>
+                                            </td>
+                                            <td className="text-center">
+                                                <span className="font-mono">
+                                                    <span className="text-success-400">{team.wins}</span>
+                                                    <span className="text-gray-500">-</span>
+                                                    <span className="text-error-400">{team.losses}</span>
+                                                </span>
+                                            </td>
+                                            <td className="text-right">
+                                                <span className={`font-mono font-bold ${team.erTqb >= 0 ? 'text-success-400' : 'text-error-400'
+                                                    }`}>
+                                                    {formatTQBValue(team.erTqb)}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ));
+                                })()}
                             </tbody>
                         </table>
                     </div>

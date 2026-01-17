@@ -341,3 +341,81 @@ export function getTieBreakMethodText(method: TieBreakMethod, lang: 'en' | 'es' 
 
     return texts[lang][method];
 }
+
+/**
+ * Calculate display ranks handling ties (teams with same record/TQB get same rank)
+ */
+export function calculateDisplayRanks(rankings: TeamStats[], isERTQB: boolean = false): number[] {
+    const ranks: number[] = [];
+    let currentRank = 1;
+
+    for (let i = 0; i < rankings.length; i++) {
+        if (i > 0) {
+            const currentVal = isERTQB ? rankings[i].erTqb : rankings[i].tqb;
+            const prevVal = isERTQB ? rankings[i - 1].erTqb : rankings[i - 1].tqb;
+
+            // They share a rank if wins are the same AND their TQB/ER-TQB are essentially equal
+            if (rankings[i].wins !== rankings[i - 1].wins || Math.abs(currentVal - prevVal) >= TIE_TOLERANCE) {
+                currentRank = i + 1;
+            }
+        }
+        ranks.push(currentRank);
+    }
+    return ranks;
+}
+
+/**
+ * Generate a dynamic explanation sentence for TQB results
+ */
+export function getDynamicTQBExplanation(rankings: TeamStats[], isERTQB: boolean = false): string {
+    if (rankings.length < 2) return '';
+
+    const winner = rankings[0];
+    const runnerUp = rankings[1];
+    const method = isERTQB ? 'ER-TQB' : 'TQB';
+
+    // Check if the tie is actually unresolved between the top two
+    const wVal = isERTQB ? winner.erTqb : winner.tqb;
+    const ruVal = isERTQB ? runnerUp.erTqb : runnerUp.tqb;
+
+    if (Math.abs(wVal - ruVal) < TIE_TOLERANCE) {
+        return `In this ${rankings.length}-way tie, the ${method} values are identical, leaving the tie unresolved at this stage.`;
+    }
+
+    // Calculate donor ratios
+    const wRunsS = isERTQB ? winner.earnedRunsScored : winner.runsScored;
+    const wRunsA = isERTQB ? winner.earnedRunsAllowed : winner.runsAllowed;
+    const wInnBat = winner.inningsAtBatOuts / 3;
+    const wInnDef = winner.inningsOnDefenseOuts / 3;
+
+    const ruRunsS = isERTQB ? runnerUp.earnedRunsScored : runnerUp.runsScored;
+    const ruRunsA = isERTQB ? runnerUp.earnedRunsAllowed : runnerUp.runsAllowed;
+    const ruInnBat = runnerUp.inningsAtBatOuts / 3;
+    const ruInnDef = runnerUp.inningsOnDefenseOuts / 3;
+
+    const wRatioS = wInnBat > 0 ? wRunsS / wInnBat : 0;
+    const wRatioA = wInnDef > 0 ? wRunsA / wInnDef : 0;
+
+    const ruRatioS = ruInnBat > 0 ? ruRunsS / ruInnBat : 0;
+    const ruRatioA = ruInnDef > 0 ? ruRunsA / ruInnDef : 0;
+
+    // Compare differences
+    // Offset_S: positive means winner has better offense
+    const offsetS = wRatioS - ruRatioS;
+    // Offset_A: positive means winner has better defense (lower ratio)
+    const offsetA = ruRatioA - wRatioA;
+
+    let decidingFactor = '';
+    let factorValue = 0;
+
+    if (offsetS > offsetA) {
+        decidingFactor = 'Offensive Efficiency';
+        factorValue = wRatioS;
+    } else {
+        decidingFactor = 'Defensive Efficiency';
+        factorValue = wRatioA;
+    }
+
+    return `In this ${rankings.length}-way tie, ${winner.name} secured Rank #1 primarily due to their superior ${decidingFactor} (${factorValue.toFixed(4)}).`;
+}
+
