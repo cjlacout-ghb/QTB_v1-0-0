@@ -208,7 +208,11 @@ export default function Home() {
 
             {/* Footer */}
             <footer className="py-4 text-center text-sm text-gray-500 border-t border-dark-600">
-                <p>TQB Calculator v1.0.0 • WBSC Rule C11 Tie-Breaker</p>
+                <div className="flex flex-col gap-1">
+                    <p className="font-medium text-gray-400">TQB Calculator v1.0.0 • WBSC Rule C11 Tie-Breaker</p>
+                    <p>Dev by Cristian Lacout - WBSC Int'l TC</p>
+                    <p className="text-xs text-gray-600">2026 - all rights reserved</p>
+                </div>
             </footer>
 
             {/* Modals */}
