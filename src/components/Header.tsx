@@ -13,9 +13,11 @@ export default function Header({ onOpenManual }: HeaderProps) {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo & Title */}
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/30">
-                            <span className="text-white font-bold text-lg">T</span>
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="TQB Calculator Logo"
+                            className="w-10 h-10 rounded-xl object-contain shadow-lg shadow-primary-500/20"
+                        />
                         <div>
                             <h1 className="text-lg font-bold text-white tracking-tight">
                                 TQB Calculator

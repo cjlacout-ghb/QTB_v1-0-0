@@ -12,6 +12,7 @@ interface TeamEntryProps {
     onContinue: () => void;
     onCSVImport: (teams: Team[], games: GameData[]) => void;
     onBack?: () => void;
+    onOpenManual?: (section?: string) => void;
 }
 
 const MAX_TEAMS = 8;
@@ -22,7 +23,8 @@ export default function TeamEntry({
     onTeamsChange,
     onContinue,
     onCSVImport,
-    onBack
+    onBack,
+    onOpenManual
 }: TeamEntryProps) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [csvError, setCSVError] = useState<string[]>([]);
@@ -158,9 +160,27 @@ export default function TeamEntry({
                             </button>
                         )}
                         <div>
-                            <h2 className="text-2xl font-bold text-white">Enter Teams</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-2xl font-bold text-white">Enter Teams</h2>
+                                <div className="group relative">
+                                    <button
+                                        onClick={() => onOpenManual?.('official-rule-c11')}
+                                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-[10px] font-bold text-primary-400 uppercase tracking-wider cursor-pointer hover:bg-primary-500/20 transition-colors"
+                                    >
+                                        Rule C11
+                                        <HelpCircle size={10} />
+                                    </button>
+                                    {/* Tooltip */}
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-dark-800 border border-dark-500 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                        <p className="text-xs text-gray-300 leading-relaxed">
+                                            This calculator follows the official <span className="text-primary-400 font-bold">WBSC Rule C11</span> tie-breaking procedures, including Win-Loss, Head-to-Head, TQB, and ER-TQB criteria.
+                                        </p>
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-dark-800"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <p className="text-sm text-gray-400 mt-1">
-                                Add {MIN_TEAMS} to {MAX_TEAMS} teams for your tournament
+                                Add teams that are involved in the tiebreaker
                             </p>
                         </div>
                     </div>
@@ -235,11 +255,11 @@ export default function TeamEntry({
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         className={`
-              relative p-6 border-2 border-dashed rounded-xl text-center
+              relative p-10 border-2 border-dashed rounded-2xl text-center
               transition-all duration-200 cursor-pointer
               ${isDragging
-                                ? 'border-primary-500 bg-primary-500/10'
-                                : 'border-dark-500 hover:border-primary-500/50'
+                                ? 'border-primary-500 bg-primary-500/10 scale-[1.01]'
+                                : 'border-dark-500 hover:border-primary-500/50 hover:bg-dark-700/30'
                             }
             `}
                         onClick={() => fileInputRef.current?.click()}
@@ -254,13 +274,13 @@ export default function TeamEntry({
                         />
 
                         <Upload
-                            size={32}
-                            className={`mx-auto mb-3 ${isDragging ? 'text-primary-400' : 'text-gray-500'}`}
+                            size={40}
+                            className={`mx-auto mb-4 ${isDragging ? 'text-primary-400' : 'text-gray-500'}`}
                         />
-                        <p className="text-gray-300 font-medium">
+                        <p className="text-gray-200 font-bold text-lg">
                             Drop your file here or click to browse
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-base text-gray-400 mt-2">
                             Pre-fill all team and game data
                         </p>
 

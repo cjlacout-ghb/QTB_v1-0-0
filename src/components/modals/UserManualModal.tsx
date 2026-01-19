@@ -11,12 +11,20 @@ import { userManualES } from '@/data/userManualES';
 interface UserManualModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialSection?: string;
 }
 
-export default function UserManualModal({ isOpen, onClose }: UserManualModalProps) {
+export default function UserManualModal({ isOpen, onClose, initialSection }: UserManualModalProps) {
     const [language, setLanguage] = useState<Language>('en');
     const [activeSection, setActiveSection] = useState<string>('introduction');
     const contentRef = useRef<HTMLDivElement>(null);
+
+    // Update active section when modal opens with initialSection
+    useEffect(() => {
+        if (isOpen && initialSection) {
+            setActiveSection(initialSection);
+        }
+    }, [isOpen, initialSection]);
 
     const content: UserManualSection[] = language === 'en' ? userManualEN : userManualES;
 

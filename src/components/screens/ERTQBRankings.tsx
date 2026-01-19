@@ -14,6 +14,7 @@ interface ERTQBRankingsProps {
     onStartNew: () => void;
     onBack?: () => void;
     games: GameData[];
+    onOpenManual?: (section?: string) => void;
 }
 
 export default function ERTQBRankings({
@@ -24,6 +25,7 @@ export default function ERTQBRankings({
     onStartNew,
     onBack,
     games,
+    onOpenManual,
 }: ERTQBRankingsProps) {
     return (
         <div className="max-w-4xl mx-auto animate-fade-in">
@@ -67,13 +69,24 @@ export default function ERTQBRankings({
                         ) : (
                             <CheckCircle size={20} className="text-success-400 flex-shrink-0 mt-0.5" />
                         )}
-                        <div>
-                            <p className={`text-sm font-medium ${hasUnresolvedTies ? 'text-warning-400' : 'text-success-400'}`}>
-                                {hasUnresolvedTies
-                                    ? getTieBreakMethodText('UNRESOLVED')
-                                    : getTieBreakMethodText(tieBreakMethod)
-                                }
-                            </p>
+                        <div className="flex-1">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <p className={`text-sm font-medium ${hasUnresolvedTies ? 'text-warning-400' : 'text-success-400'}`}>
+                                    {hasUnresolvedTies
+                                        ? getTieBreakMethodText('UNRESOLVED')
+                                        : getTieBreakMethodText(tieBreakMethod)
+                                    }
+                                </p>
+                                {hasUnresolvedTies && onOpenManual && (
+                                    <button
+                                        onClick={() => onOpenManual('official-rule-c11')}
+                                        className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-primary-400 bg-primary-500/10 hover:bg-primary-500/20 border border-primary-500/30 rounded-lg transition-all group"
+                                    >
+                                        <Info size={14} className="text-primary-400 group-hover:scale-110 transition-transform" />
+                                        <span>See Rule C11 resolution</span>
+                                    </button>
+                                )}
+                            </div>
                             {!hasUnresolvedTies && (
                                 <p className="text-xs text-gray-400 mt-1">
                                     If further tie-breaking is needed: 5) Highest Batting Average | 6) Coin Toss
@@ -130,14 +143,23 @@ export default function ERTQBRankings({
                     <TQBExplanationTable rankings={rankings} isERTQB={true} />
 
                     {/* ER-TQB Formula */}
-                    <div className="p-4 bg-dark-700/50 rounded-xl border border-dark-500">
-                        <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                            <Info size={14} />
-                            ER-TQB Formula
-                        </h4>
-                        <p className="font-mono text-sm text-primary-400">
-                            ER-TQB = (Earned Runs Scored ÷ Innings at Bat) - (Earned Runs Allowed ÷ Innings on Defense)
-                        </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-dark-700/50 rounded-xl border border-dark-500">
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
+                                <Info size={14} />
+                                ER-TQB Formula
+                            </h4>
+                            <p className="font-mono text-sm text-primary-400">
+                                ER-TQB = (Earned Runs Scored ÷ Innings at Bat) - (Earned Runs Allowed ÷ Innings on Defense)
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => onOpenManual?.('official-rule-c11')}
+                            className="text-xs font-bold text-primary-400 hover:text-primary-300 uppercase tracking-widest flex items-center gap-1.5 transition-colors group"
+                        >
+                            <span>View Official Rule C11</span>
+                            <ArrowLeft size={14} className="rotate-180 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
                     </div>
 
                     {/* Comparison: TQB vs ER-TQB */}

@@ -103,66 +103,6 @@ export function calculateTeamStats(
 }
 
 /**
- * Get head-to-head record among a group of tied teams
- * Returns the teams sorted by their record among themselves
- */
-function getHeadToHeadRecord(
-    tiedTeams: TeamStats[],
-    games: GameData[]
-): { team: TeamStats; h2hWins: number; h2hLosses: number }[] {
-    const tiedIds = new Set(tiedTeams.map(t => t.id));
-
-    // Filter games to only those between tied teams
-    const relevantGames = games.filter(
-        g => tiedIds.has(g.teamAId) && tiedIds.has(g.teamBId)
-    );
-
-    const h2hRecords = tiedTeams.map(team => {
-        let h2hWins = 0;
-        let h2hLosses = 0;
-
-        for (const game of relevantGames) {
-            const isTeamA = game.teamAId === team.id;
-            const isTeamB = game.teamBId === team.id;
-
-            if (!isTeamA && !isTeamB) continue;
-
-            const myRuns = isTeamA ? (game.runsA ?? 0) : (game.runsB ?? 0);
-            const oppRuns = isTeamA ? (game.runsB ?? 0) : (game.runsA ?? 0);
-
-            if (myRuns > oppRuns) h2hWins++;
-            else if (myRuns < oppRuns) h2hLosses++;
-        }
-
-        return { team, h2hWins, h2hLosses };
-    });
-
-    // Sort by h2h wins descending, then losses ascending
-    return h2hRecords.sort((a, b) => {
-        if (b.h2hWins !== a.h2hWins) return b.h2hWins - a.h2hWins;
-        return a.h2hLosses - b.h2hLosses;
-    });
-}
-
-/**
- * Check if head-to-head resolves a tie by seeing if records are different
- */
-function headToHeadResolvesTie(
-    h2hRecords: { team: TeamStats; h2hWins: number; h2hLosses: number }[]
-): boolean {
-    for (let i = 0; i < h2hRecords.length - 1; i++) {
-        // If any two adjacent teams have the same h2h record, tie not resolved
-        if (
-            h2hRecords[i].h2hWins === h2hRecords[i + 1].h2hWins &&
-            h2hRecords[i].h2hLosses === h2hRecords[i + 1].h2hLosses
-        ) {
-            return false;
-        }
-    }
-    return true;
-}
-
-/**
  * Check if TQB values resolve ties among teams with same win-loss record
  */
 function tqbResolvesTies(teams: TeamStats[], useTQB: boolean = true): boolean {
@@ -193,6 +133,143 @@ function tqbResolvesTies(teams: TeamStats[], useTQB: boolean = true): boolean {
 }
 
 /**
+ * Linear Waterfall (Sequential) tie-breaking engine following WBSC Softball regulations
+ * Criteria (H2H -> TQB -> ER-TQB) are applied in order. Once a tie moves to the next
+ * level, it never returns to Step 1.
+ */
+function resolveTieWaterfall(
+    tiedTeams: TeamStats[],
+    allGames: GameData[],
+    criteriaLevel: number, // 1: H2H, 2: TQB, 3: ER-TQB
+    context: {
+        maxMethodUsed: TieBreakMethod,
+        allowERTQB: boolean,
+        hasUnresolvedTies: boolean,
+    }
+): TeamStats[] {
+    if (tiedTeams.length <= 1) return tiedTeams;
+
+    // Safety break if we ran out of criteria
+    if (criteriaLevel > 3 || (criteriaLevel === 3 && !context.allowERTQB)) {
+        context.hasUnresolvedTies = true;
+        return tiedTeams;
+    }
+
+    // Rule C11.2 & C11.3: Use ONLY results of games played between the tied teams
+    const tiedIds = new Set(tiedTeams.map(t => t.id));
+    const relevantGames = allGames.filter(
+        g => tiedIds.has(g.teamAId) && tiedIds.has(g.teamBId)
+    );
+
+    let subgroups: TeamStats[][] = [];
+    let currentMethod: TieBreakMethod = 'WIN_LOSS';
+
+    if (criteriaLevel === 1) {
+        // Step 1: Head-to-Head
+        const h2h = tiedTeams.map(team => {
+            let wins = 0;
+            let losses = 0;
+            for (const game of relevantGames) {
+                const isA = game.teamAId === team.id;
+                const isB = game.teamBId === team.id;
+                if (!isA && !isB) continue;
+
+                const myRuns = isA ? (game.runsA ?? 0) : (game.runsB ?? 0);
+                const oppRuns = isA ? (game.runsB ?? 0) : (game.runsA ?? 0);
+
+                if (myRuns > oppRuns) wins++;
+                else if (myRuns < oppRuns) losses++;
+            }
+            return { team, wins, losses };
+        });
+
+        const groups: Map<string, TeamStats[]> = new Map();
+        for (const record of h2h) {
+            const key = `${record.wins}-${record.losses}`;
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key)!.push(record.team);
+        }
+
+        const sortedKeys = Array.from(groups.keys()).sort((a, b) => {
+            const [aw, al] = a.split('-').map(Number);
+            const [bw, bl] = b.split('-').map(Number);
+            if (bw !== aw) return bw - aw;
+            return al - bl;
+        });
+
+        subgroups = sortedKeys.map(k => groups.get(k)!);
+        currentMethod = 'HEAD_TO_HEAD';
+    }
+    else {
+        // Step 2 or 3: TQB or ER-TQB
+        const useERTQB = criteriaLevel === 3;
+        const targetMethod: TieBreakMethod = useERTQB ? 'ER_TQB' : 'TQB';
+
+        // Calculate localized stats for these teams based on relevant games
+        const localStats = tiedTeams.map(t => calculateTeamStats(t.id, t.name, relevantGames));
+
+        const sorted = [...localStats].sort((a, b) => {
+            const valA = useERTQB ? a.erTqb : a.tqb;
+            const valB = useERTQB ? b.erTqb : b.tqb;
+            return valB - valA;
+        });
+
+        const groups: TeamStats[][] = [];
+        if (sorted.length > 0) {
+            let currentGroup: TeamStats[] = [sorted[0]];
+            for (let i = 1; i < sorted.length; i++) {
+                const prevVal = useERTQB ? sorted[i - 1].erTqb : sorted[i - 1].tqb;
+                const currVal = useERTQB ? sorted[i].erTqb : sorted[i].tqb;
+
+                if (Math.abs(prevVal - currVal) < TIE_TOLERANCE) {
+                    currentGroup.push(sorted[i]);
+                } else {
+                    groups.push(currentGroup);
+                    currentGroup = [sorted[i]];
+                }
+            }
+            groups.push(currentGroup);
+        }
+
+        // Map localized stats back into the ranking, but preserve global wins/losses for UI
+        subgroups = groups.map(group => group.map(ls => {
+            const original = tiedTeams.find(t => t.id === ls.id)!;
+            return {
+                ...ls,
+                wins: original.wins, // Global win record
+                losses: original.losses, // Global loss record
+            };
+        }));
+        currentMethod = targetMethod;
+    }
+
+    // Update global context if separation occurred
+    if (subgroups.length > 1) {
+        const methodOrder: TieBreakMethod[] = ['WIN_LOSS', 'HEAD_TO_HEAD', 'TQB', 'ER_TQB', 'UNRESOLVED'];
+        if (methodOrder.indexOf(currentMethod) > methodOrder.indexOf(context.maxMethodUsed)) {
+            context.maxMethodUsed = currentMethod;
+        }
+    }
+
+    // IF NOT SEPARATED: Try next criteria level on the SAME group
+    if (subgroups.length === 1) {
+        return resolveTieWaterfall(tiedTeams, allGames, criteriaLevel + 1, context);
+    }
+
+    // IF SEPARATED: Narrow the tie group and move to NEXT criteria level
+    const result: TeamStats[] = [];
+    for (const group of subgroups) {
+        if (group.length > 1) {
+            result.push(...resolveTieWaterfall(group, allGames, criteriaLevel + 1, context));
+        } else {
+            result.push(group[0]);
+        }
+    }
+
+    return result;
+}
+
+/**
  * Main ranking calculation function
  */
 export function calculateRankings(
@@ -200,12 +277,12 @@ export function calculateRankings(
     games: GameData[],
     useERTQB: boolean = false
 ): RankingResult {
-    // Step 1: Calculate stats for all teams
+    // Step 1: Calculate global stats for all teams
     const allStats = teams.map(team =>
         calculateTeamStats(team.id, team.name, games)
     );
 
-    // Step 2: Sort by wins (descending)
+    // Step 2: Sort by overall wins (descending)
     allStats.sort((a, b) => b.wins - a.wins);
 
     // Step 3: Group teams by win count
@@ -217,9 +294,11 @@ export function calculateRankings(
         rankGroups.get(team.wins)!.push(team);
     }
 
-    let tieBreakMethod: TieBreakMethod = 'WIN_LOSS';
-    let needsTQB = false;
-    let needsERTQB = false;
+    const context = {
+        maxMethodUsed: 'WIN_LOSS' as TieBreakMethod,
+        allowERTQB: useERTQB,
+        hasUnresolvedTies: false
+    };
 
     // Step 4: Process each group of teams with same wins
     const finalRankings: TeamStats[] = [];
@@ -233,47 +312,17 @@ export function calculateRankings(
             continue;
         }
 
-        // Multiple teams with same record - apply tie-breakers
-        // Try head-to-head first
-        const h2hRecords = getHeadToHeadRecord(group, games);
-
-        if (headToHeadResolvesTie(h2hRecords)) {
-            // Head-to-head resolved it
-            if (tieBreakMethod === 'WIN_LOSS') {
-                tieBreakMethod = 'HEAD_TO_HEAD';
-            }
-            finalRankings.push(...h2hRecords.map(r => r.team));
-        } else {
-            // Head-to-head didn't resolve - use TQB or ER-TQB
-            needsTQB = true;
-
-            const sortedByBalance = [...group].sort((a, b) => {
-                const balanceA = useERTQB ? a.erTqb : a.tqb;
-                const balanceB = useERTQB ? b.erTqb : b.tqb;
-                return balanceB - balanceA;
-            });
-
-            if (tieBreakMethod === 'WIN_LOSS' || tieBreakMethod === 'HEAD_TO_HEAD') {
-                tieBreakMethod = useERTQB ? 'ER_TQB' : 'TQB';
-            }
-
-            finalRankings.push(...sortedByBalance);
-        }
+        // Multiple teams with same record - apply Waterfall tie-breakers
+        finalRankings.push(...resolveTieWaterfall(group, games, 1, context));
     }
 
-    // Check if there are still unresolved ties
-    const hasTies = !tqbResolvesTies(finalRankings, !useERTQB);
-
-    if (hasTies && !useERTQB) {
-        needsERTQB = true;
-    } else if (hasTies && useERTQB) {
-        tieBreakMethod = 'UNRESOLVED';
-    }
+    // needsERTQB is true if unresolved ties exist and we haven't used ER-TQB yet
+    const needsERTQB = !useERTQB && context.hasUnresolvedTies;
 
     return {
         rankings: finalRankings,
-        tieBreakMethod,
-        hasTies,
+        tieBreakMethod: context.hasUnresolvedTies && !useERTQB ? 'TQB' : (context.hasUnresolvedTies ? 'UNRESOLVED' : context.maxMethodUsed),
+        hasTies: context.hasUnresolvedTies,
         needsERTQB,
     };
 }

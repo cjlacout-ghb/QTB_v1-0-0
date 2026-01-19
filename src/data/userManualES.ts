@@ -315,6 +315,43 @@ Haga clic en **"Iniciar Nuevo Cálculo"** en cualquier pantalla de resultados pa
     `,
     },
     {
+        id: 'official-rule-c11',
+        title: 'Regla Oficial C11: Desempates',
+        content: `
+### Reglamento de Torneos WBSC - Regla C11
+
+Todos los empates después de la Ronda de Apertura, Super Ronda y Finales se resolverán en el siguiente orden:
+
+---
+
+**1. Resultados Directos (Head-to-Head)**
+El equipo que ganó el partido(s) jugado entre los equipos empatados recibirá la posición más alta.
+
+**2. Balance de Calidad del Equipo (TQB)**
+Si hay un empate entre tres o más equipos y los resultados directos no resuelven el empate, se utilizará el balance de calidad del equipo (TQB) para determinar la clasificación.
+- **Fórmula**: (Carreras Anotadas / Entradas Jugadas al Bate) – (Carreras Permitidas / Entradas Jugadas en Defensa).
+- El TQB incorpora tanto el rendimiento ofensivo como el defensivo.
+
+**3. TQB de Carreras Limpias (ER-TQB)**
+Si el empate persiste, se utilizará el ER-TQB para determinar la clasificación.
+- **Fórmula**: (Carreras Limpias Anotadas / Entradas Jugadas al Bate) – (Carreras Limpias Permitidas / Entradas Jugadas en Defensa).
+
+**4. Promedio de Bateo Más Alto**
+El equipo con el promedio de bateo más alto en los partidos jugados entre los equipos empatados recibirá la posición más alta.
+
+**5. Lanzamiento de Moneda**
+Un lanzamiento de moneda determinará la clasificación como último recurso.
+
+---
+
+### IMPORTANTE: La Regla de Cascada
+Según las regulaciones de la WBSC Softball:
+> *"Los criterios de desempate se aplican en orden secuencial. Una vez que un empate pasa a un paso posterior (como el TQB), el cálculo se basa ÚNICAMENTE en los juegos jugados entre los equipos involucrados en ese empate específico."*
+
+**Ejemplo**: Si los Equipos A, B y C están empatados y los resultados Directos son circulares, la aplicación pasa al TQB. Si el TQB separa al Equipo A como el #1, pero B y C permanecen iguales, la aplicación pasa al Paso 3 (ER-TQB) para B y C, usando solo el juego entre ellos. La lógica avanza y nunca regresa al enfrentamiento Directo.
+    `,
+    },
+    {
         id: 'about',
         title: 'Acerca de la Regla C11 de WBSC',
         content: `

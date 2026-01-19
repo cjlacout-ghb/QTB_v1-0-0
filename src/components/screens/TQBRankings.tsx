@@ -16,6 +16,7 @@ interface TQBRankingsProps {
     onBack?: () => void;
     totalSteps: number;
     games: GameData[];
+    onOpenManual?: (section?: string) => void;
 }
 
 export default function TQBRankings({
@@ -28,6 +29,7 @@ export default function TQBRankings({
     onBack,
     totalSteps,
     games,
+    onOpenManual,
 }: TQBRankingsProps) {
     return (
         <div className="max-w-4xl mx-auto animate-fade-in">
@@ -134,14 +136,23 @@ export default function TQBRankings({
                     <TQBExplanationTable rankings={rankings} />
 
                     {/* TQB Formula */}
-                    <div className="p-4 bg-dark-700/50 rounded-xl border border-dark-500">
-                        <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                            <Info size={14} />
-                            TQB Formula
-                        </h4>
-                        <p className="font-mono text-sm text-primary-400">
-                            TQB = (Runs Scored ÷ Innings at Bat) - (Runs Allowed ÷ Innings on Defense)
-                        </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-dark-700/50 rounded-xl border border-dark-500">
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
+                                <Info size={14} />
+                                TQB Formula
+                            </h4>
+                            <p className="font-mono text-sm text-primary-400">
+                                TQB = (Runs Scored ÷ Innings at Bat) - (Runs Allowed ÷ Innings on Defense)
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => onOpenManual?.('official-rule-c11')}
+                            className="text-xs font-bold text-primary-400 hover:text-primary-300 uppercase tracking-widest flex items-center gap-1.5 transition-colors group"
+                        >
+                            <span>View Official Rule C11</span>
+                            <ArrowLeft size={14} className="rotate-180 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
                     </div>
 
                     {/* Game Results Summary */}

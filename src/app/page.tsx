@@ -28,7 +28,13 @@ export default function Home() {
 
     // Modal states
     const [isManualOpen, setIsManualOpen] = useState(false);
+    const [manualSection, setManualSection] = useState<string | undefined>();
     const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
+
+    const handleOpenManual = useCallback((section?: string) => {
+        setManualSection(section);
+        setIsManualOpen(true);
+    }, []);
 
     // Scroll to top when screen changes
     useEffect(() => {
@@ -131,6 +137,7 @@ export default function Home() {
                         onContinue={handleContinueToGames}
                         onCSVImport={handleCSVImport}
                         onBack={handleBack}
+                        onOpenManual={handleOpenManual}
                     />
                 );
 
@@ -158,6 +165,7 @@ export default function Home() {
                         onBack={handleBack}
                         totalSteps={totalSteps}
                         games={games}
+                        onOpenManual={handleOpenManual}
                     />
                 );
 
@@ -181,6 +189,7 @@ export default function Home() {
                         onStartNew={handleStartNew}
                         onBack={handleBack}
                         games={games}
+                        onOpenManual={handleOpenManual}
                     />
                 );
 
@@ -191,7 +200,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header onOpenManual={() => setIsManualOpen(true)} />
+            <Header onOpenManual={() => handleOpenManual()} />
 
             <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">
                 {renderScreen()}
@@ -205,7 +214,11 @@ export default function Home() {
             {/* Modals */}
             <UserManualModal
                 isOpen={isManualOpen}
-                onClose={() => setIsManualOpen(false)}
+                onClose={() => {
+                    setIsManualOpen(false);
+                    setManualSection(undefined);
+                }}
+                initialSection={manualSection}
             />
 
             <PDFExportModal

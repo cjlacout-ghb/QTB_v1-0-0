@@ -44,7 +44,7 @@ export default function PDFExportModal({ isOpen, onClose, data }: PDFExportModal
         };
     }, [isOpen, onClose]);
 
-    const handleGenerate = async () => {
+    const handleGenerate = () => {
         if (!tournamentName.trim()) {
             setError('Please enter a tournament name');
             return;
@@ -54,16 +54,15 @@ export default function PDFExportModal({ isOpen, onClose, data }: PDFExportModal
         setError('');
 
         try {
-            // Small delay for UX
-            await new Promise(resolve => setTimeout(resolve, 500));
-
+            // Generate PDF immediately to preserve user gesture context
             generatePDF({
                 ...data,
                 tournamentName: tournamentName.trim(),
                 date: formatDate(date),
             });
 
-            onClose();
+            // Small delay before closing to ensure the browser processes the download link
+            setTimeout(onClose, 200);
         } catch (err) {
             setError('Failed to generate PDF. Please try again.');
             console.error('PDF generation error:', err);
@@ -85,14 +84,14 @@ export default function PDFExportModal({ isOpen, onClose, data }: PDFExportModal
 
             {/* Modal */}
             <div
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md animate-slide-up"
+                className="modal-content max-w-md animate-slide-up"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="export-title"
             >
-                <div className="card">
+                <div className="card h-full max-h-full flex flex-col overflow-hidden">
                     {/* Header */}
-                    <div className="card-header flex items-center justify-between">
+                    <div className="card-header flex items-center justify-between flex-shrink-0">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
                                 <FileDown size={20} className="text-primary-400" />
@@ -112,7 +111,7 @@ export default function PDFExportModal({ isOpen, onClose, data }: PDFExportModal
                     </div>
 
                     {/* Content */}
-                    <div className="card-body space-y-5">
+                    <div className="card-body flex-1 overflow-y-auto space-y-5">
                         {/* Tournament Name */}
                         <div>
                             <label
