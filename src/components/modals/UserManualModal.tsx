@@ -113,7 +113,7 @@ export default function UserManualModal({ isOpen, onClose, initialSection }: Use
                         </div>
 
                         {/* Content */}
-                        <div className="flex flex-1 overflow-hidden">
+                        <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
                             {/* Sidebar Navigation */}
                             <nav className="w-56 flex-shrink-0 border-r border-dark-500 overflow-y-auto p-4 hidden md:block">
                                 <ul className="space-y-1">
