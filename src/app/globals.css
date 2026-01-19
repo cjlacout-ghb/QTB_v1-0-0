@@ -203,7 +203,7 @@ body {
   }
 
   .modal-content {
-    @apply fixed top-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl max-h-[calc(100vh-80px)] overflow-hidden flex flex-col;
+    @apply w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative z-50 pointer-events-auto shadow-2xl;
   }
 
   /* Tooltip */

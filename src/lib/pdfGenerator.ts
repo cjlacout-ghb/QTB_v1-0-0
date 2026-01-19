@@ -30,7 +30,12 @@ export function generatePDF(data: PDFExportData): void {
     doc.setTextColor(...textLight);
     doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.text(data.tournamentName || 'Tournament', pageWidth / 2, 20, { align: 'center' });
+
+    const titleText = data.tournamentName
+        ? `${data.tournamentName} | tie-break report`
+        : 'Tie-Break Report';
+
+    doc.text(titleText, pageWidth / 2, 20, { align: 'center' });
 
     // Subtitle
     doc.setFontSize(12);
